@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <section class="hero">
+        <p class="eyebrow">SMART AGRICULTURE</p>
+        <h1>Grow smarter with data.</h1>
+        <p>Sensor-assisted crop recommendations, seed lookup and irrigation guidance.</p>
+        <a class="button" href="{{ url_for('predict') }}">Start prediction →</a>
+    </section>
+
+    <h2>Latest sensor reading</h2>
+    <p class="muted">Source: {{ sensor.source }}</p>
+
+    <div class="cards">
+        <div class="card">
+            <span>Temperature</span>
+            <strong>{{ sensor.temperature }} °C</strong>
+        </div>
+        <div class="card">
+            <span>Humidity</span>
+            <strong>{{ sensor.humidity }} %</strong>
+        </div>
+        <div class="card">
+            <span>Soil moisture</span>
+            <strong>{{ sensor.moisture }} %</strong>
+        </div>
+    </div>
+
+    <p class="notice">
+        Demo values are shown if the ESP32 serial connection is unavailable.
+        Set SMARTFARMING_SERIAL_PORT to your board's port.
+    </p>
+{% endblock %}

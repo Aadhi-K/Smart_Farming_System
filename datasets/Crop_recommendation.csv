@@ -1,0 +1,16 @@
+Temperature,Humidity,Moisture,Season,Soil,Crop
+30,70,65,Summer,Black,Rice
+29,75,60,Monsoon,Clay,Rice
+28,80,68,Monsoon,Loamy,Rice
+32,55,40,Summer,Red,Cotton
+31,58,42,Summer,Black,Cotton
+28,68,58,Winter,Loamy,Wheat
+25,60,45,Winter,Clay,Wheat
+31,60,50,Summer,Sandy,Groundnut
+30,65,52,Monsoon,Red,Groundnut
+27,72,55,Monsoon,Loamy,Maize
+33,58,38,Summer,Red,Maize
+26,70,48,Winter,Loamy,Tomato
+29,75,60,Winter,Clay,Onion
+30,72,55,Summer,Loamy,Chilli
+28,78,62,Monsoon,Black,Sugarcane

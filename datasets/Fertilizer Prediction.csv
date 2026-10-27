@@ -1,0 +1,11 @@
+Crop,Stage,Days,Fertilizer,Quantity
+Rice,Vegetative,20,Urea,25 kg/acre
+Rice,Panicle initiation,45,NPK as per soil test,Follow soil-test recommendation
+Cotton,Vegetative,30,NPK as per soil test,Follow soil-test recommendation
+Wheat,Tillering,25,Urea,Follow local soil-test recommendation
+Groundnut,Flowering,35,Gypsum where recommended,Follow soil-test recommendation
+Maize,Vegetative,25,NPK as per soil test,Follow soil-test recommendation
+Tomato,Flowering,35,Potassium-rich fertilizer,Follow soil-test recommendation
+Onion,Bulb formation,45,NPK as per soil test,Follow soil-test recommendation
+Chilli,Flowering,40,Potassium-rich fertilizer,Follow soil-test recommendation
+Sugarcane,Early growth,45,NPK as per soil test,Follow soil-test recommendation

@@ -1,0 +1,10 @@
+Crop,ScientificName,Season,Duration,Soil,WaterRequirement,Description
+Rice,Oryza sativa,Monsoon,120-150 days,Clay or loamy,High,Staple cereal crop; needs reliable water supply
+Cotton,Gossypium hirsutum,Summer,150-180 days,Black or red,Medium,Commercial fibre crop
+Wheat,Triticum aestivum,Winter,110-140 days,Loamy,Medium,Cool-season cereal crop
+Groundnut,Arachis hypogaea,Summer,100-120 days,Sandy loam,Medium,Oilseed and food legume
+Maize,Zea mays,Monsoon,90-120 days,Loamy,Medium,Versatile grain and fodder crop
+Tomato,Solanum lycopersicum,Winter,90-120 days,Loamy,Medium,Vegetable crop; avoid waterlogging
+Onion,Allium cepa,Winter,100-120 days,Loamy,Medium,Bulb vegetable crop
+Chilli,Capsicum annuum,Summer,120-150 days,Loamy,Medium,Spice crop
+Sugarcane,Saccharum officinarum,Monsoon,10-18 months,Loamy,High,Long-duration commercial crop

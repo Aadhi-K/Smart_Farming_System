@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <p class="eyebrow">YOUR REPORT</p>
+    <h1>Recommended crop: {{ result.crop }}</h1>
+
+    <div class="cards">
+        <div class="card">
+            <span>Suggested seed</span>
+            <strong>{{ result.seed }}</strong>
+        </div>
+        <div class="card">
+            <span>Soil</span>
+            <strong>{{ result.soil }}</strong>
+        </div>
+        <div class="card">
+            <span>Season</span>
+            <strong>{{ result.season }}</strong>
+        </div>
+    </div>
+
+    <h2>Readings</h2>
+    <p>
+        Temperature: {{ result.temperature }} °C · Humidity: {{ result.humidity }}%
+        · Moisture: {{ result.moisture }}%
+    </p>
+
+    <h2>Crop details</h2>
+    <div class="card">
+        <p><b>Scientific name:</b> {{ result.details.get('ScientificName', '—') }}</p>
+        <p><b>Duration:</b> {{ result.details.get('Duration', '—') }}</p>
+        <p><b>Water:</b> {{ result.details.get('WaterRequirement', '—') }}</p>
+        <p>{{ result.details.get('Description', '') }}</p>
+    </div>
+
+    <h2>Irrigation guidance</h2>
+    <div class="card">
+        <b>Pump suggestion: {{ result.irrigation.get('Pump_Status', 'UNKNOWN') }}</b>
+        <p>{{ result.irrigation.get('Recommendation', '') }}</p>
+    </div>
+
+    <h2>Fertilizer dataset lookup</h2>
+    {% if result.fertilizer %}
+        <ul>
+            {% for f in result.fertilizer %}
+                <li>
+                    {{ f.Stage }} ({{ f.Days }} days): {{ f.Fertilizer }} — {{ f.Quantity }}
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No matching entry.</p>
+    {% endif %}
+
+    <h2>Disease reference</h2>
+    {% if result.disease %}
+        {% for d in result.disease %}
+            <div class="card">
+                <b>{{ d.Disease }}</b>
+                <p>{{ d.Symptoms }}</p>
+                <p><b>Prevention:</b> {{ d.Prevention }}</p>
+                <p><b>Medicine:</b> {{ d.Medicine }}</p>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>No matching entry.</p>
+    {% endif %}
+
+    <p class="notice">
+        Educational demo only. Crop suitability, fertilizer, disease and irrigation advice
+        must be verified using local soil tests and agricultural extension guidance. The
+        example training dataset is tiny and synthetic.
+    </p>
+    <a class="button" href="{{ url_for('predict') }}">New prediction</a>
+{% endblock %}

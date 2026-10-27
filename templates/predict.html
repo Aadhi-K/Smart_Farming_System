@@ -1,0 +1,225 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Crop recommendation</h1>
+
+    <form method="post" enctype="multipart/form-data" class="form">
+        <div class="grid">
+            <label>
+                Temperature (°C)
+                <input name="temperature" type="number" step="0.1" value="{{ sensor.temperature }}" required>
+            </label>
+            <label>
+                Humidity (%)
+                <input name="humidity" type="number" step="0.1" min="0" max="100" value="{{ sensor.humidity }}" required>
+            </label>
+            <label>
+                Soil moisture (%)
+                <input name="moisture" type="number" step="0.1" min="0" max="100" value="{{ sensor.moisture }}" required>
+            </label>
+            <label>
+                Month
+                <select name="month">
+                    {% for m in ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'] %}
+                        <option {% if m == month %}selected{% endif %}>{{ m }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+        </div>
+
+        <fieldset class="soil-setup">
+            <legend>How would you like to identify your soil?</legend>
+            <div class="soil-mode-selector">
+                <label class="soil-mode-option">
+                    <input type="radio" name="soil_mode" value="known" checked>
+                    <span>I know my soil type</span>
+                </label>
+                <label class="soil-mode-option">
+                    <input type="radio" name="soil_mode" value="photo">
+                    <span>Identify it from a photo</span>
+                </label>
+            </div>
+
+            <div id="known-soil-panel" class="soil-panel">
+                <label for="soil-type">Soil type</label>
+                <select id="soil-type" name="soil">
+                    {% for s in ['Black', 'Clay', 'Loamy', 'Red', 'Sandy'] %}
+                        <option>{{ s }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div id="photo-soil-panel" class="soil-panel" hidden>
+                <fieldset class="photo-source-selector">
+                    <legend>Choose a photo option</legend>
+                    <label>
+                        <input type="radio" name="image_source" value="upload" checked>
+                        Upload a photo
+                    </label>
+                    <label>
+                        <input type="radio" name="image_source" value="camera">
+                        Take a photo
+                    </label>
+                </fieldset>
+
+                <div id="upload-photo-panel">
+                    <label for="soil-image">Choose a soil photo</label>
+                    <input id="soil-image" type="file" name="soil_image" accept="image/*">
+                </div>
+
+                <div id="camera-photo-panel" hidden>
+                    <video id="soil-camera-preview" autoplay playsinline hidden></video>
+                    <div class="camera-controls">
+                        <button id="start-camera" type="button">Open camera</button>
+                        <button id="capture-photo" type="button" hidden disabled>Take photo</button>
+                    </div>
+                    <p id="camera-status" class="muted" role="status" aria-live="polite">
+                        Camera access requires your permission.
+                    </p>
+                </div>
+            </div>
+        </fieldset>
+
+        <button type="submit">Generate recommendation</button>
+    </form>
+
+    <p class="notice">
+        Photo-based soil identification requires a trained soil image model. If it is
+        unavailable, the app uses the default soil type.
+    </p>
+
+    <script>
+        const soilModeInputs = document.querySelectorAll('input[name="soil_mode"]');
+        const imageSourceInputs = document.querySelectorAll('input[name="image_source"]');
+        const knownSoilPanel = document.getElementById("known-soil-panel");
+        const photoSoilPanel = document.getElementById("photo-soil-panel");
+        const uploadPhotoPanel = document.getElementById("upload-photo-panel");
+        const cameraPhotoPanel = document.getElementById("camera-photo-panel");
+        const soilTypeInput = document.getElementById("soil-type");
+        const soilImageInput = document.getElementById("soil-image");
+        const cameraPreview = document.getElementById("soil-camera-preview");
+        const cameraStatus = document.getElementById("camera-status");
+        const startCameraButton = document.getElementById("start-camera");
+        const capturePhotoButton = document.getElementById("capture-photo");
+        let cameraStream;
+
+        cameraPreview.addEventListener("loadedmetadata", () => {
+            capturePhotoButton.disabled = cameraPreview.videoWidth === 0;
+            cameraStatus.textContent = "Camera ready. Frame the soil and take a photo.";
+        });
+
+        function stopCamera() {
+            if (!cameraStream) {
+                return;
+            }
+
+            cameraStream.getTracks().forEach((track) => track.stop());
+            cameraStream = null;
+            cameraPreview.srcObject = null;
+            cameraPreview.hidden = true;
+            capturePhotoButton.hidden = true;
+            startCameraButton.hidden = false;
+        }
+
+        function updateImageSource() {
+            const useCamera = document.querySelector(
+                'input[name="image_source"]:checked'
+            ).value === "camera";
+
+            uploadPhotoPanel.hidden = useCamera;
+            cameraPhotoPanel.hidden = !useCamera;
+            soilImageInput.required = !useCamera;
+
+            if (!useCamera) {
+                stopCamera();
+            }
+        }
+
+        function updateSoilMode() {
+            const usePhoto = document.querySelector(
+                'input[name="soil_mode"]:checked'
+            ).value === "photo";
+
+            knownSoilPanel.hidden = usePhoto;
+            photoSoilPanel.hidden = !usePhoto;
+            soilTypeInput.required = !usePhoto;
+            soilImageInput.required = usePhoto &&
+                document.querySelector('input[name="image_source"]:checked').value === "upload";
+
+            if (!usePhoto) {
+                stopCamera();
+            }
+        }
+
+        soilModeInputs.forEach((input) => {
+            input.addEventListener("change", updateSoilMode);
+        });
+        imageSourceInputs.forEach((input) => {
+            input.addEventListener("change", updateImageSource);
+        });
+
+        startCameraButton.addEventListener("click", async () => {
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                cameraStatus.textContent = "Camera access is not available in this browser.";
+                return;
+            }
+
+            try {
+                capturePhotoButton.disabled = true;
+                cameraStream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: { ideal: "environment" } },
+                    audio: false,
+                });
+                cameraPreview.srcObject = cameraStream;
+                cameraPreview.hidden = false;
+                startCameraButton.hidden = true;
+                capturePhotoButton.hidden = false;
+                cameraStatus.textContent = "Starting camera preview...";
+            } catch (error) {
+                cameraStatus.textContent = "Camera permission was denied or no camera was found.";
+            }
+        });
+
+        capturePhotoButton.addEventListener("click", () => {
+            const canvas = document.createElement("canvas");
+            canvas.width = cameraPreview.videoWidth;
+            canvas.height = cameraPreview.videoHeight;
+            canvas.getContext("2d").drawImage(
+                cameraPreview,
+                0,
+                0,
+                canvas.width,
+                canvas.height
+            );
+
+            canvas.toBlob((blob) => {
+                if (!blob) {
+                    cameraStatus.textContent = "Could not capture the photo. Please try again.";
+                    return;
+                }
+
+                const photo = new File([blob], "soil-photo.jpg", { type: "image/jpeg" });
+                const transfer = new DataTransfer();
+                transfer.items.add(photo);
+                soilImageInput.files = transfer.files;
+                cameraStatus.textContent = "Photo captured and ready to submit.";
+                stopCamera();
+            }, "image/jpeg", 0.9);
+        });
+
+        document.querySelector("form").addEventListener("submit", (event) => {
+            const usePhoto = document.querySelector(
+                'input[name="soil_mode"]:checked'
+            ).value === "photo";
+
+            if (usePhoto && soilImageInput.files.length === 0) {
+                event.preventDefault();
+                cameraStatus.textContent = "Choose or capture a soil photo before continuing.";
+            }
+        });
+
+        updateImageSource();
+        updateSoilMode();
+        window.addEventListener("pagehide", stopCamera);
+    </script>
+{% endblock %}

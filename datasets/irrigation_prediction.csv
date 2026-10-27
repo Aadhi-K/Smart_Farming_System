@@ -1,0 +1,5 @@
+Moisture_Min,Moisture_Max,Pump_Status,Water_Required,Recommendation
+0,25,ON,High,Soil moisture is low; irrigate and recheck sensor
+26,40,ON,Medium,Consider irrigation depending on crop and soil
+41,65,OFF,Low,Moisture is moderate; check crop needs
+66,100,OFF,None,Moisture is high; avoid overwatering
